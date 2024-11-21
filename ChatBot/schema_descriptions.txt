@@ -1,0 +1,59 @@
+**dimdate:**
+
+* Columns: `DateKey` (INTEGER, PK), `FullDateAlternateKey` (DATE), `DayNumberOfWeek` (TINYINT), `EnglishDayNameOfWeek` (VARCHAR(10)), `SpanishDayNameOfWeek` (VARCHAR(10)), `FrenchDayNameOfWeek` (VARCHAR(10)), `DayNumberOfMonth` (TINYINT), `DayNumberOfYear` (SMALLINT), `WeekNumberOfYear` (TINYINT), `EnglishMonthName` (VARCHAR(10)), `SpanishMonthName` (VARCHAR(10)), `FrenchMonthName` (VARCHAR(10)), `MonthNumberOfYear` (TINYINT), `CalendarQuarter` (TINYINT), `CalendarYear` (SMALLINT), `CalendarSemester` (TINYINT), `FiscalQuarter` (TINYINT), `FiscalYear` (SMALLINT), `FiscalSemester` (TINYINT)
+* Primary Key: `DateKey`
+* Example Row: (20050101, 2005-01-01, 7, 'Saturday', 'Sábado', 'Samedi', 1, 1, 1, 'January', 'Enero', 'Janvier', 1, 1, 2005, 1, 3, 2005, 2)
+
+
+**dimemployee:**
+
+* Columns: `EmployeeKey` (INTEGER, PK), `FirstName` (VARCHAR(50)), `LastName` (VARCHAR(50)), `MiddleName` (VARCHAR(50)), `Title` (VARCHAR(50)), `EmailAddress` (VARCHAR(50)), `Phone` (VARCHAR(25)), `SalariedFlag` (TINYINT), `Gender` (CHAR(1)), `PayFrequency` (TINYINT), `BaseRate` (DECIMAL(19,4)), `VacationHours` (SMALLINT), `SickLeaveHours` (SMALLINT), `CurrentFlag` (TINYINT), `SalesPersonFlag` (TINYINT), `DepartmentName` (VARCHAR(50)), `StartDate` (DATE), `EndDate` (DATE)
+* Primary Key: `EmployeeKey`
+* Example Row: (1, 'Guy', 'Gilbert', 'R', 'Production Technician - WC60', 'guy1@adventure-works.com', '320-555-0195', 0, 'M', 1, 12.4500, 21, 30, 1, 0, 'Production', '2006-01-28', NULL)
+
+
+**dimgeography:**
+
+* Columns: `GeographyKey` (INTEGER, PK), `City` (VARCHAR(30)), `StateProvinceName` (VARCHAR(50)), `EnglishCountryRegionName` (VARCHAR(50))
+* Primary Key: `GeographyKey`
+* Example Row: (1, 'Alexandria', 'New South Wales', 'Australia')
+
+
+**dimproduct:**
+
+* Columns: `ProductKey` (INTEGER, PK), `ProductAlternateKey` (VARCHAR(25)), `ProductSubcategoryKey` (INTEGER, FK), `WeightUnitMeasureCode` (CHAR(3)), `SizeUnitMeasureCode` (CHAR(3)), `EnglishProductName` (VARCHAR(50)), `StandardCost` (DECIMAL(19,4)), `FinishedGoodsFlag` (TINYINT), `Color` (VARCHAR(15)), `SafetyStockLevel` (SMALLINT), `ReorderPoint` (SMALLINT), `ListPrice` (DECIMAL(19,4)), `Size` (VARCHAR(50)), `SizeRange` (VARCHAR(50)), `Weight` (DOUBLE), `DaysToManufacture` (INTEGER), `ProductLine` (CHAR(2)), `DealerPrice` (DECIMAL(19,4)), `Class` (CHAR(2)), `Style` (CHAR(2)), `ModelName` (VARCHAR(50)), `EnglishDescription` (VARCHAR(400)), `StartDate` (DATETIME(6)), `EndDate` (DATETIME(6)), `Status` (VARCHAR(7))
+* Primary Key: `ProductKey`
+* Foreign Key: `ProductSubcategoryKey` referencing `dimproductsubcategory`
+* Example Row: (1, 'AR-5381', NULL, NULL, NULL, 'Adjustable Race', NULL, 0, 'NA', 1000, 750, NULL, NULL, 'NA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2003-07-01 00:00:00', NULL, 'Current')
+
+
+**dimproductcategory:**
+
+* Columns: `ProductCategoryKey` (INTEGER, PK), `EnglishProductCategoryName` (VARCHAR(50))
+* Primary Key: `ProductCategoryKey`
+* Example Row: (1, 'Bikes')
+
+
+**dimproductsubcategory:**
+
+* Columns: `ProductSubcategoryKey` (INTEGER, PK), `EnglishProductSubcategoryName` (VARCHAR(50)), `ProductCategoryKey` (INTEGER, FK)
+* Primary Key: `ProductSubcategoryKey`
+* Foreign Key: `ProductCategoryKey` referencing `dimproductcategory`
+* Example Row: (1, 'Mountain Bikes', 1)
+
+
+**factinternetsales:**
+
+* Columns: `ProductKey` (INTEGER, FK), `OrderDateKey` (INTEGER, FK), `DueDateKey` (INTEGER, FK), `ShipDateKey` (INTEGER, FK), `SalesOrderNumber` (VARCHAR(20), PK), `SalesOrderLineNumber` (TINYINT, PK), `OrderQuantity` (SMALLINT), `UnitPrice` (DECIMAL(19,4)), `ExtendedAmount` (DECIMAL(19,4)), `UnitPriceDiscountPct` (DOUBLE), `DiscountAmount` (DOUBLE), `ProductStandardCost` (DECIMAL(19,4)), `TotalProductCost` (DECIMAL(19,4)), `SalesAmount` (DECIMAL(19,4)), `TaxAmt` (DECIMAL(19,4)), `Freight` (DECIMAL(19,4)), `OrderDate` (DATETIME(6)), `DueDate` (DATETIME(6)), `ShipDate` (DATETIME(6))
+* Primary Key: (`SalesOrderNumber`, `SalesOrderLineNumber`)
+* Foreign Keys: `ProductKey` referencing `dimproduct`, `OrderDateKey`, `DueDateKey`, `ShipDateKey` referencing `dimdate`
+* Example Row: (310, 20101229, 20110110, 20110105, 'SO43697', 1, 1, 3578.2700, 3578.2700, 0, 0, 2171.2942, 2171.2942, 3578.2700, 286.2616, 89.4568, '2010-12-29 00:00:00', '2011-01-10 00:00:00', '2011-01-05 00:00:00')
+
+
+**factresellersales:**
+
+* Columns: `ProductKey` (INTEGER, FK), `OrderDateKey` (INTEGER, FK), `DueDateKey` (INTEGER, FK), `ShipDateKey` (INTEGER, FK), `EmployeeKey` (INTEGER, FK), `SalesOrderNumber` (VARCHAR(20), PK), `SalesOrderLineNumber` (TINYINT, PK), `OrderQuantity` (SMALLINT), `UnitPrice` (DECIMAL(19,4)), `ExtendedAmount` (DECIMAL(19,4)), `UnitPriceDiscountPct` (DOUBLE), `DiscountAmount` (DOUBLE), `ProductStandardCost` (DECIMAL(19,4)), `TotalProductCost` (DECIMAL(19,4)), `SalesAmount` (DECIMAL(19,4)), `TaxAmt` (DECIMAL(19,4)), `Freight` (DECIMAL(19,4)), `OrderDate` (DATETIME(6)), `DueDate` (DATETIME(6)), `ShipDate` (DATETIME(6))
+* Primary Key: (`SalesOrderNumber`, `SalesOrderLineNumber`)
+* Foreign Keys: `ProductKey` referencing `dimproduct`, `OrderDateKey`, `DueDateKey`, `ShipDateKey` referencing `dimdate`, `EmployeeKey` referencing `dimemployee`
+* Example Row: (349, 20101229, 20110110, 20110105, 285, 'SO43659', 1, 1, 2024.9940, 2024.9940, 0, 0, 1898.0944, 1898.0944, 2024.9940, 161.9995, 50.6249, '2010-12-29 00:00:00', '2011-01-10 00:00:00', '2011-01-05 00:00:00')
+--------------------------------------------------------------------------------
